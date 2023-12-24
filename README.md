@@ -9,6 +9,7 @@ The script is invoked from the command line with several arguments:
 ### Arguments
 - `-i, --ip_address`: The IP address of the Modbus server. This argument is required.
 - `-a, --modbus_address`: The Modbus address to read. This argument is required.
+- `-p, --port`:  Port of the Modbus server, default is 502.
 - `-s, --slave_id`: The Slave ID of the Modbus server. This argument is optional, with a default value of 1.
 - `-r, --register_type`: The type of Modbus register to read. This argument is optional, with a default value of 'holding_register'. Possible choices are 'coil', 'input_status', 'input_register', 'holding_register'.
 - `-d, --data_type`: The data type to interpret the Modbus data. This argument is optional, with a default value of 'Uint16'. Possible choices are 'Binary', 'HEX', 'Uint16', 'Int16', 'Uint32', 'Int32', 'Float32'.

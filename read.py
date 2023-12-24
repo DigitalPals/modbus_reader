@@ -13,15 +13,16 @@ logger = logging.getLogger(__name__)
 REGISTER_TYPES = ['coil', 'input_status', 'input_register', 'holding_register']
 DATA_TYPES = ['Binary', 'HEX', 'Uint16', 'Int16', 'Uint32', 'Int32', 'Float32']
 
-def connect_to_modbus_server(ip_address: str, slave_id: int) -> ModbusClient:
+def connect_to_modbus_server(ip_address: str, slave_id: int, port: int = 502) -> ModbusClient:
     """
     Connect to the Modbus server and return the client object.
 
     :param ip_address: IP address of the Modbus server
     :param slave_id: Slave ID of the Modbus server
+    :param port: Port of the Modbus server, default is 502
     :return: Modbus client object
     """
-    client = ModbusClient(ip_address, unit=slave_id)
+    client = ModbusClient(ip_address, port=port, unit=slave_id)
     client.connect()
     return client
 
@@ -82,6 +83,7 @@ def parse_arguments() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(description='Read Modbus address')
     parser.add_argument('-i', '--ip_address', required=True, help='IP address of the Modbus server')
+    parser.add_argument('-p', '--port', type=int, default=502, help='Port of the Modbus server, default is 502')
     parser.add_argument('-a', '--modbus_address', required=True, type=int, help='Modbus address to read')
     parser.add_argument('-s', '--slave_id', type=int, default=1, help='Slave ID of the Modbus server')
     parser.add_argument('-r', '--register_type', default='holding_register', choices=REGISTER_TYPES, help='Type of Modbus register to read')
@@ -100,7 +102,7 @@ def main() -> None:
     args = parse_arguments()
 
     try:
-        client = connect_to_modbus_server(args.ip_address, args.slave_id)
+        client = connect_to_modbus_server(args.ip_address, args.slave_id, args.port)
         result = read_modbus_data(client, args.modbus_address, args.data_type, args.register_type)
         decode_and_print_data(result, args.data_type)
     except (ConnectionException, ModbusException) as e:
