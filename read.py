@@ -1,6 +1,7 @@
 import argparse
 import logging
 import sys
+from typing import Any
 from pymodbus.client import ModbusTcpClient as ModbusClient
 from pymodbus.constants import Endian
 from pymodbus.exceptions import ConnectionException, ModbusException
@@ -12,12 +13,28 @@ logger = logging.getLogger(__name__)
 REGISTER_TYPES = ['coil', 'input_status', 'input_register', 'holding_register']
 DATA_TYPES = ['Binary', 'HEX', 'Uint16', 'Int16', 'Uint32', 'Int32', 'Float32']
 
-def connect_to_modbus_server(ip_address, slave_id):
+def connect_to_modbus_server(ip_address: str, slave_id: int) -> ModbusClient:
+    """
+    Connect to the Modbus server and return the client object.
+
+    :param ip_address: IP address of the Modbus server
+    :param slave_id: Slave ID of the Modbus server
+    :return: Modbus client object
+    """
     client = ModbusClient(ip_address, unit=slave_id)
     client.connect()
     return client
 
-def read_modbus_data(client, modbus_address, data_type, register_type):
+def read_modbus_data(client: ModbusClient, modbus_address: int, data_type: str, register_type: str) -> Any:
+    """
+    Read data from the Modbus server.
+
+    :param client: Modbus client object
+    :param modbus_address: Modbus address to read
+    :param data_type: Data type to interpret the Modbus data
+    :param register_type: Type of Modbus register to read
+    :return: Result from the Modbus read operation
+    """
     if register_type == 'coil':
         result = client.read_coils(modbus_address, 1)
     elif register_type == 'input_status':
@@ -31,7 +48,13 @@ def read_modbus_data(client, modbus_address, data_type, register_type):
             result = client.read_holding_registers(modbus_address, 1)
     return result
 
-def decode_and_print_data(result, data_type):
+def decode_and_print_data(result: Any, data_type: str) -> None:
+    """
+    Decode the Modbus data and print it.
+
+    :param result: Result from the Modbus read operation
+    :param data_type: Data type to interpret the Modbus data
+    """
     if not result.isError():
         decoder = BinaryPayloadDecoder.fromRegisters(result.registers, byteorder=Endian.BIG, wordorder=Endian.LITTLE)
         if data_type == 'Binary':
@@ -51,7 +74,12 @@ def decode_and_print_data(result, data_type):
     else:
         logger.error('Error reading modbus address')
 
-def parse_arguments():
+def parse_arguments() -> argparse.Namespace:
+    """
+    Parse command line arguments.
+
+    :return: Parsed arguments
+    """
     parser = argparse.ArgumentParser(description='Read Modbus address')
     parser.add_argument('-i', '--ip_address', required=True, help='IP address of the Modbus server')
     parser.add_argument('-a', '--modbus_address', required=True, type=int, help='Modbus address to read')
@@ -65,7 +93,10 @@ def parse_arguments():
     
     return parser.parse_args()
 
-def main():
+def main() -> None:
+    """
+    Main function to connect to the Modbus server, read data, decode it, and print it.
+    """
     args = parse_arguments()
 
     try:
