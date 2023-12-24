@@ -24,3 +24,5 @@ The script handles connection errors by printing an error message and closing th
 ## Dependencies
 
 This script requires the pymodbus library. You can install it with pip:
+
+```pip install pymodbus```
